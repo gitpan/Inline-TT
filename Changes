@@ -1,4 +1,25 @@
-Revision history for Perl extension Inline::TT
+Revision history for Perl extension Inline::TT.
+
+0.04  Fri May 13 13:04:38 CDT 2005
+	- added tests to verify that INCLUDE directive works, PROCESS was not
+	  tested, but persumably works since the differences are inside TT
+	- added examples directory and the simple example.  Not coincidentally
+	  it looks a lot like t/02_simple.t
+	- added info support, so using perl -MInline=INFO program returns
+	  a list of bound subs extracted from tt2 blocks (this only works
+	  if a good _Inline or equivalent directory exists, otherwise callers
+	  are instructed to rerun).
+
+0.03  Mon Apr 11 10:46:02 2005
+	- since I could not make Inline-TT-0.02 work, I started from scratch
+	  as I worked, I looked at the original version frequently, so I
+	  say thanks to Tatsuhiko Miyagawa for the original
+	- my version was created by h2xs 1.23 with options
+		-AXn Inline::TT
+
+After version 0.02, Phil Crow took over maintanence from Tatsuhiko Miyagawa.
+
+Revision history for Perl extension Inline::TT from the original
 
 0.02  Thu Aug 22 19:17:36 JST 2002
 	- Turned POST_CHOMP off

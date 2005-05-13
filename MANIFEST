@@ -1,8 +1,17 @@
 Changes
-MANIFEST
-Makefile.PL
+examples/_Inline/config
+examples/_Inline/lib/auto/simple_f77b/simple_f77b.inl
+examples/_Inline/lib/auto/simple_f77b/simple_f77b.tt2
+examples/simple
 lib/Inline/TT.pm
-t/00_compile.t
-t/01_add.t
-t/02_rubyish.t
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+pod2htmd.tmp
+pod2htmi.tmp
 README
+t/01_load.t
+t/02_simple.t
+t/03_include.t
+t/datarec.tt
+t/header.tt
