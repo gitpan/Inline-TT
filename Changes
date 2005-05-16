@@ -1,5 +1,11 @@
 Revision history for Perl extension Inline::TT.
 
+0.05  Mon May 16 10:04:05 CDT 2005
+	- cleaned documentation slightly
+	- cleaned MANIFEST
+	- resubmitted to CPAN since 0.04 was not indexed due to ownership
+	  conflict (I sent 0.04 up before being made co-maintainer).
+
 0.04  Fri May 13 13:04:38 CDT 2005
 	- added tests to verify that INCLUDE directive works, PROCESS was not
 	  tested, but persumably works since the differences are inside TT

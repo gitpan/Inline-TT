@@ -11,7 +11,7 @@ use Template::Document;
 use Template::Context;
 use Template::Stash;
 
-our $VERSION	= '0.04';
+our $VERSION	= '0.05';
 our @ISA		= qw( Inline );
 
 # To understand the methods here it helps to read the Inline API docs:
@@ -162,44 +162,43 @@ Alternatively:
   [% BLOCK hello %]
 	<H1> Hello [% name %], how are you? </H1>
   [% END %]
-  [% BLOCK goodbye %]
-    <H1> Goodbye [% name %], have a nice day. </H1>
-  [% END %]
   EO_TEMPLATE
 
   print hello( { name => 'Rob' } ), "\n";
 
-  print goodbye( { name => 'Rob' } ), "\n";
-
-See the Inline perldoc for even more choices.
+See the Inline perldoc for even more ways to reference the inline source.
 
 =head1 DESCRIPTION
 
-Inline::TT provides Inline access to version 2.0 and higher of the
+C<Inline::TT> provides Inline access to version 2.0 and higher of the
 Template Toolkit.  This allows you to house your templates inside the
 source code file, while retaining the ability to cache compiled templates
-on the disk.
+on the disk (via Inline's caching mechanism).
 
 The names of the blocks in the template are exported as functions.  Call
 these with a reference to a hash of values, which will be used for
 interpolation in the templates.  This hash reference is the same as the
-second argument to the process method of any Template object.  The output
-from template toolkit will be returned to you as a single string.
+second argument to the C<process> method of any Template object.  The output
+from template toolkit will be returned to you as a single string.  Note
+that leading and trailing spaces are trimmed, further the template toolkit
+options PRE_CHOMP and POST_CHOMP are set.  Currently, there is no way to
+change these behaviors.
 
 =head1 RATIONALE
 
 Some people (including me at times) prefer to separate formatting from
-code, but not by much.  We don't like to have html embedded inside Perl,
-but we don't want to have to hunt on the disk for a template whose name
-is likely hidden in a config file (a config file whose name we may not
-even remember).  By using Inline::TT, you can store the templates in the
-program, but away from the code that supplies their data.  Yet, because
-of the wonders of Inline, you still have caching of templates.  (For
-details about caching see the Inline documentation, search for _Inline.)
+code, but not by much.  For example, we don't like to have xml embedded
+inside Perl, but we don't want to have to hunt on the disk for a template
+whose name is likely hidden in a config file (a config file whose name we
+may not even remember).  By using Inline::TT, we can store the templates
+in the program, but away from the code that supplies their data.  Yet,
+because of the wonders of Inline, we still benefit from disk based caching
+of templates.  (For details about caching see the Inline documentation,
+search for _Inline.)
 
 =head2 EXPORT
 
-The names you used for the blocks in the template, are exported into
+The names you used for the BLOCKs in the template, are exported into
 your calling package as sub names.
 
 =head1 LIMITATIONS and KNOWN BUGS
@@ -208,9 +207,9 @@ Only things in BLOCKs are accessible through Inline::TT.
 
 =head1 SEE ALSO
 
-This module is one of many in the Inline:: family.  You must have
-Inline version 0.44 or higher to use this module.  See the Inline
-documenation for how to control the location of files it caches.
+This module is one of many in the Inline:: family.  You must have Inline
+version 0.42 or higher to use this module.  See the Inline documenation
+for how to control the location of files it caches.
 
 =head1 AUTHOR
 
