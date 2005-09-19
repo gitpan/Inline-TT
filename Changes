@@ -1,6 +1,21 @@
 Revision history for Perl extension Inline::TT.
 
+0.06 Mon Sep 19 14:18:03 CDT 2005
+    - Warning: Changed defaults for PRE_CHOMP and POST_CHOMP to be the
+      same as they are in TT.  This could affect whitespace surrounding
+      your results.  To go back to The Old Way, use PRE_CHOMP => 1,
+      POST_CHOMP => 1.  Note that leading and trailing space is still
+      removed by default, but see the next item.
+    - Added TRIM_LEADING_SPACE and TRIM_TRAILING_SPACE as options to
+      Inline::TT.  Use these to remove all leading and/or trailing space.
+      These are on by default for consistency with prior versions of
+      Inline::TT.
+
 0.05  Mon May 16 10:04:05 CDT 2005
+	- removed requirements for a minimum perl version and lowered
+	  the required template toolkit version to 2.0.  I should probably
+	  have stuck with a minimum of perl 5.6.1, but I just took it out.
+	  Early versions will fail on things like our.
 	- cleaned documentation slightly
 	- cleaned MANIFEST
 	- resubmitted to CPAN since 0.04 was not indexed due to ownership

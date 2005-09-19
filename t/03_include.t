@@ -2,7 +2,11 @@
 
 use Test::More tests => 2;
 
-use Inline TT => 'DATA';
+use Inline (
+    TT         => 'DATA',
+    PRE_CHOMP  => 1,
+    POST_CHOMP => 1,
+);
 
 my $output = simple( { name => 'Rob' } );
 

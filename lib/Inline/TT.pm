@@ -11,8 +11,15 @@ use Template::Document;
 use Template::Context;
 use Template::Stash;
 
-our $VERSION	= '0.05';
+our $TRIM_LEADING_SPACE  = 'TRIM_LEADING_SPACE';
+our $TRIM_TRAILING_SPACE = 'TRIM_TRAILING_SPACE';
+
+our $VERSION	= '0.06';
 our @ISA		= qw( Inline );
+our %default_inline_tt_option_for = (
+    $TRIM_LEADING_SPACE  => 1,
+    $TRIM_TRAILING_SPACE => 1,
+);
 
 # To understand the methods here it helps to read the Inline API docs:
 # http://search.cpan.org/~ingy/Inline-0.44/Inline-API.pod
@@ -26,9 +33,31 @@ sub register {
 	};
 }
 
-# No config options yet => not yet implemented
+# TRIM_LEADING_SPACES and TRIM_TRAILING_SPACES are valid options.  They
+# both default to 1.  All other options are passed directly to TT.
 sub validate {
-	return 1;
+    my $o          = shift;
+    my %option_for = @_;
+
+    foreach my $option ( keys %default_inline_tt_option_for ) {
+        if ( defined $option_for{$option} ) {
+
+            $o->{ILSM}{Inline_TT_options}{$option} = $option_for{$option};
+
+            delete $option_for{$option};
+
+        }
+        else {
+            $o->{ILSM}{Inline_TT_options}{$option}
+                    = $default_inline_tt_option_for{$option};
+        }
+    }
+
+    $o->{ILSM}{TT_options} = {};
+
+    foreach my $option ( keys %option_for ) {
+        $o->{ILSM}{TT_options}{$option} = $option_for{$option};
+    }
 }
 
 # To provide any useful information, we must rehydrate the stored object.
@@ -71,11 +100,12 @@ sub build {
 	my $o		= shift;
 	my $code	= $o->{API}{code};
 
-	my $parser	= Template::Parser->new( { PRE_CHOMP => 1, POST_CHOMP => 1 } );
+	my $parser	= Template::Parser->new( $o->{ILSM}{TT_options} );
 	my $content	= $parser->parse( $code );
 
 	my $path	= "$o->{API}{install_lib}/auto/$o->{API}{modpname}";
 	my $obj		= $o->{API}{location};
+
 	$o->mkpath( $path ) unless -d $path;
 
 	store( $content, $obj );  # from Storable
@@ -98,7 +128,7 @@ sub load {
 
 		no strict 'refs';
 
-		*{"$o->{API}{pkg}\::$sub"} = _make_block_sub( $sub, $document );
+		*{"$o->{API}{pkg}\::$sub"} = _make_block_sub( $sub, $document, $o );
 	}
 
 	croak "Unable to load TT module $obj:\n$@" if $@;
@@ -112,6 +142,7 @@ sub load {
 sub _make_block_sub {
 	my $name	= shift;
 	my $doc		= shift;
+    my $o       = shift;
 
 	return sub {
 		my $args	= shift;
@@ -121,8 +152,12 @@ sub _make_block_sub {
 
 		my $retval	= $doc->{_DEFBLOCKS}{$name}( $context );
 
-		$retval		=~ s/^\s+//; # trim leading and trailing spaces
-		$retval		=~ s/\s+$//;
+        if ( $o->{ILSM}{Inline_TT_options}{$TRIM_LEADING_SPACE} ) {
+		    $retval		=~ s/^\s+//;
+        }
+        if ( $o->{ILSM}{Inline_TT_options}{$TRIM_TRAILING_SPACE} ) {
+    		$retval		=~ s/\s+$//;
+        }
 
 		return $retval;
 	}
@@ -183,6 +218,38 @@ from template toolkit will be returned to you as a single string.  Note
 that leading and trailing spaces are trimmed, further the template toolkit
 options PRE_CHOMP and POST_CHOMP are set.  Currently, there is no way to
 change these behaviors.
+
+=head1 OPTIONS
+
+You can pass options to Inline::TT.  Two of the options are specific
+to Inline::TT:
+
+=over 4
+
+=item TRIM_LEADING_SPACES
+
+Set this to one to remove all leading spaces from the text generated
+by TT.  You should also consider using PRE_CHOMP, if you use PROCESS
+or INCLUDE directives.
+
+=item TRIM_TRAILING_SPACES
+
+Set this to one to remove all trailing spaces from the text generated
+by TT.  You should also consider using POST_CHOMP, if you use PROCESS
+or INCLUDE directives.
+
+=back
+
+These two options work on the final and complete string.  They don't
+remove ANY interior spaces, only the ones at the beginning and end of
+the whole string.
+
+The rest of the options are passed without comment or validation directly
+to TT.
+
+Note passing options can be done at compile time or at run time.
+To do it at run time, use Inline->bind.  See t/06_options for examples
+of passing options at run time and at compile time.
 
 =head1 RATIONALE
 
