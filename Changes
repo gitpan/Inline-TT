@@ -1,5 +1,10 @@
 Revision history for Perl extension Inline::TT.
 
+0.07 Sat Feb  4 08:57:50 CST 2006
+    - Traded tabs for spaces in the source code.
+    - Accepted patch from Stephen Howard which allows for block nesting
+      (so one block can PROCESS another).
+
 0.06 Mon Sep 19 14:18:03 CDT 2005
     - Warning: Changed defaults for PRE_CHOMP and POST_CHOMP to be the
       same as they are in TT.  This could affect whitespace surrounding

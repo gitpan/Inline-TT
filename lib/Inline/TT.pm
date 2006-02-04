@@ -14,23 +14,23 @@ use Template::Stash;
 our $TRIM_LEADING_SPACE  = 'TRIM_LEADING_SPACE';
 our $TRIM_TRAILING_SPACE = 'TRIM_TRAILING_SPACE';
 
-our $VERSION	= '0.06';
-our @ISA		= qw( Inline );
+our $VERSION    = '0.07';
+our @ISA        = qw( Inline );
 our %default_inline_tt_option_for = (
-    $TRIM_LEADING_SPACE  => 1,
-    $TRIM_TRAILING_SPACE => 1,
+        $TRIM_LEADING_SPACE  => 1,
+        $TRIM_TRAILING_SPACE => 1,
 );
 
 # To understand the methods here it helps to read the Inline API docs:
 # http://search.cpan.org/~ingy/Inline-0.44/Inline-API.pod
 
 sub register {
-	return {
-		language	=> 'TT',
-		aliases		=> [ qw( tt template ) ],
-		type		=> 'interpreted',
-		suffix		=> 'tt2',
-	};
+    return {
+        language        => 'TT',
+        aliases	        => [ qw( tt template ) ],
+        type	        => 'interpreted',
+        suffix	        => 'tt2',
+    };
 }
 
 # TRIM_LEADING_SPACES and TRIM_TRAILING_SPACES are valid options.  They
@@ -49,7 +49,7 @@ sub validate {
         }
         else {
             $o->{ILSM}{Inline_TT_options}{$option}
-                    = $default_inline_tt_option_for{$option};
+            = $default_inline_tt_option_for{$option};
         }
     }
 
@@ -67,26 +67,26 @@ sub validate {
 # XXX This does not work for the first invocation.  That's bad, since
 # that's the most likely one to request info.
 sub info {
-	my $o = shift;
-	my $obj			= $o->{API}{location};
-	my $retval;
+    my $o       = shift;
+    my $obj     = $o->{API}{location};
+    my $retval;
 
-	eval {
-		# retrieve is exported from Storable
-		my $tt_code		= retrieve( $obj );
-		my $document	= Template::Document->new( $tt_code );
-		my $blocks		= join( "\n  ", sort keys %{$document->{_DEFBLOCKS}} );
+    eval {
+        # retrieve is exported from Storable
+        my $tt_code     = retrieve( $obj );
+        my $document    = Template::Document->new( $tt_code );
+        my $blocks      = join( "\n  ", sort keys %{$document->{_DEFBLOCKS}} );
 
-		$retval			= "The following tt2 blocks have been bound as subs:"
-						. "\n  $blocks\n";
-	};
+        $retval	        = "The following tt2 blocks have been bound as subs:"
+            . "\n  $blocks\n";
+    };
 
-	# If the _Inline directory is not yet built, this error will occur.
-	if ( $@ ) {
-		$retval = "Rerun, without deleting _Inline, to see INFO.\n";
- 	}
+    # If the _Inline directory is not yet built, this error will occur.
+    if ( $@ ) {
+        $retval = "Rerun, without deleting _Inline, to see INFO.\n";
+    }
 
-	return $retval;
+    return $retval;
 }
 
 sub working_info { return "no useful info, sorry\n"; }
@@ -97,18 +97,18 @@ sub working_info { return "no useful info, sorry\n"; }
 # match one that is available in the _Inline directory (or its moral
 # equivalent).  Otherwise, it will only call load below.
 sub build {
-	my $o		= shift;
-	my $code	= $o->{API}{code};
+    my $o       = shift;
+    my $code    = $o->{API}{code};
 
-	my $parser	= Template::Parser->new( $o->{ILSM}{TT_options} );
-	my $content	= $parser->parse( $code );
+    my $parser  = Template::Parser->new( $o->{ILSM}{TT_options} );
+    my $content = $parser->parse( $code );
 
-	my $path	= "$o->{API}{install_lib}/auto/$o->{API}{modpname}";
-	my $obj		= $o->{API}{location};
+    my $path    = "$o->{API}{install_lib}/auto/$o->{API}{modpname}";
+    my $obj     = $o->{API}{location};
 
-	$o->mkpath( $path ) unless -d $path;
+    $o->mkpath( $path ) unless -d $path;
 
-	store( $content, $obj );  # from Storable
+    store( $content, $obj );  # from Storable
 }
 
 # This routine rehydrates the parsed Template object which was originally
@@ -118,20 +118,20 @@ sub build {
 # package.  No, we really shouldn't be peeking inside to the _DEFBLOCKS
 # level, but I couldn't find the relavent API.
 sub load {
-	my $o			= shift;
-	my $obj			= $o->{API}{location};
+    my $o        = shift;
+    my $obj      = $o->{API}{location};
 
-	my $tt_code		= retrieve( $obj );  # from Storable
-	my $document	= Template::Document->new( $tt_code );
+    my $tt_code  = retrieve( $obj );  # from Storable
+    my $document = Template::Document->new( $tt_code );
 
-	foreach my $sub ( keys %{$document->{_DEFBLOCKS}} ) {
+    foreach my $sub ( keys %{$document->{_DEFBLOCKS}} ) {
 
-		no strict 'refs';
+        no strict 'refs';
 
-		*{"$o->{API}{pkg}\::$sub"} = _make_block_sub( $sub, $document, $o );
-	}
+        *{"$o->{API}{pkg}\::$sub"} = _make_block_sub( $sub, $document, $o );
+    }
 
-	croak "Unable to load TT module $obj:\n$@" if $@;
+    croak "Unable to load TT module $obj:\n$@" if $@;
 }
 
 # _make_block_sub takes the name of a block and the document containing it
@@ -140,27 +140,33 @@ sub load {
 # block.  A lot of trimming happens.  Typically, no space is left for
 # template directives.  Further, no leading or trailing spaces survive.
 sub _make_block_sub {
-	my $name	= shift;
-	my $doc		= shift;
+    my $name    = shift;
+    my $doc     = shift;
     my $o       = shift;
 
-	return sub {
-		my $args	= shift;
+    return sub {
+        my $args    = shift;
 
-		my $stash	= Template::Stash->new( $args );
-		my $context	= Template::Context->new( { STASH => $stash, TRIM => 1 } );
+        my $stash   = Template::Stash->new( $args );
+        my $context = Template::Context->new(
+            {
+                STASH  => $stash,
+                TRIM   => 1,
+                BLOCKS => $doc->{_DEFBLOCKS},
+            }
+        );
 
-		my $retval	= $doc->{_DEFBLOCKS}{$name}( $context );
+        my $retval  = $doc->{_DEFBLOCKS}{$name}( $context );
 
         if ( $o->{ILSM}{Inline_TT_options}{$TRIM_LEADING_SPACE} ) {
-		    $retval		=~ s/^\s+//;
+            $retval =~ s/^\s+//;
         }
         if ( $o->{ILSM}{Inline_TT_options}{$TRIM_TRAILING_SPACE} ) {
-    		$retval		=~ s/\s+$//;
+            $retval =~ s/\s+$//;
         }
 
-		return $retval;
-	}
+        return $retval;
+    }
 }
 
 1;
@@ -176,30 +182,30 @@ Inline::TT provides Inline support for Template Toolkit versions 2.x.
 
 =head1 SYNOPSIS
 
-  use Inline TT => 'DATA';
+    use Inline TT => 'DATA';
 
-  print hello( { name => 'Rob' } ), "\n";
+    print hello( { name => 'Rob' } ), "\n";
 
-  print goodbye( { name => 'Rob' } ), "\n";
+    print goodbye( { name => 'Rob' } ), "\n";
 
-  __DATA__
-  __TT__
-  [% BLOCK hello %]
-	<H1> Hello [% name %], how are you? </H1>
-  [% END %]
-  [% BLOCK goodbye %]
+    __DATA__
+    __TT__
+    [% BLOCK hello %]
+    <H1> Hello [% name %], how are you? </H1>
+    [% END %]
+    [% BLOCK goodbye %]
     <H1> Goodbye [% name %], have a nice day. </H1>
-  [% END %]
+    [% END %]
 
 Alternatively:
 
-  use Inline TT => << EO_TEMPLATE
-  [% BLOCK hello %]
-	<H1> Hello [% name %], how are you? </H1>
-  [% END %]
-  EO_TEMPLATE
+    use Inline TT => << EO_TEMPLATE
+    [% BLOCK hello %]
+    <H1> Hello [% name %], how are you? </H1>
+    [% END %]
+    EO_TEMPLATE
 
-  print hello( { name => 'Rob' } ), "\n";
+    print hello( { name => 'Rob' } ), "\n";
 
 See the Inline perldoc for even more ways to reference the inline source.
 
